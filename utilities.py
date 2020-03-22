@@ -113,8 +113,16 @@ def treg(xs, ys, fig, ax):
         i += 20
     return fig, ax
 
+
+"""
+TODO:
+    - Implement exponential a + be^x
+    - Implement trig a + bsin(cx + d)
+"""
+
+
 def reg(xs, ys, p):
-    """ Find line of best fit for given data
+    """ Given xs and ys, plot linear regression with features p
     Args: 
         xs : List/array-like of x co-ordinates.
         ys : List/array-like of y co-ordinates.
@@ -127,12 +135,17 @@ def reg(xs, ys, p):
     else: 
         ls = gls(xs, ys, p)
         print(ls)
-        lx = np.linspace(xs.min(), xs.max(), 400)
+        lx = np.linspace(xs.min(), xs.max(), len(xs))
 
         ly = 0
         for i in range(0, p):
            ly += ls[i] * lx ** i
+        print(square_error(ys, ly))
         ax.plot(lx, ly, '.')
 
     plt.show()
+
+def square_error(y, y_est):
+    return np.sum((y - y_est) ** 2)
+
 
