@@ -99,7 +99,10 @@ def gls(xs, ys, p):
         r = np.power(xs, i)
         x_o = np.column_stack((x_o, r))
 
-    v = np.linalg.inv(x_o.T.dot(x_o)).dot(x_o.T).dot(ys)
+    # TODO This is thrwoing single matrix error (does not have inverse)
+    v1 = np.linalg.inv(x_o.T.dot(x_o))
+    v2 = v1.dot(x_o.T)
+    v = v2.dot(ys)
     return v
 
 def treg(xs, ys, fig, ax):
