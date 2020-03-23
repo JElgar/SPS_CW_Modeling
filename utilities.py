@@ -104,7 +104,7 @@ def gls(xs, ys, p):
     return v
 
 def exp_ls(xs, ys):
-    x = np.column_stack((np.ones(xs.shape), np.exp(xs))
+    x = np.column_stack(np.ones(xs.shape), np.exp(xs))
     v = np.linalg.inv(x.T.dot(x)).dot(x.T).dot(ys)
     return v
 
@@ -201,7 +201,7 @@ def best_p (xs, ys):
     return errors.index(min(errors)) + 2
 
 def best_model (xs, ys):
-
+    print("This needs implementing")
 
 def split_regression(xs, ys):
     fig, ax = view_data_segments(xs, ys)  
