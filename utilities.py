@@ -156,18 +156,13 @@ def best_p (xs, ys):
     MAX_FEATURES = 5
     NUM_REPEATS = 50
 
-    if (len(xs) != 20):
-        print("xs lenght was not equal 20 so stuffs gonna break")
-        print("actually not yet")
-
-    
     """
     Find the error in each of the models, shuffle the data and repeat, adding the errors each time
     At the end select the model with the lowest error and jobs a gooden
     """
     xs_shuffle = c.deepcopy(xs)
     ys_shuffle = c.deepcopy(ys)
-    errors = [0] * (MAX_FEATURES - 2)
+    errors = [0] * (MAX_FEATURES - 1)
     for i in range(0, NUM_REPEATS):
         rng_state = np.random.get_state()
         np.random.set_state(rng_state)
@@ -178,7 +173,7 @@ def best_p (xs, ys):
         assert not are_lists_identical(ys, ys_shuffle)
         xs_training, xs_testing = xs_shuffle[6:], xs_shuffle[:6]
         ys_training, ys_testing = ys_shuffle[6:], ys_shuffle[:6]
-        print("The lenght of the training data is: " + str(len(xs_training)))
+        # print("The lenght of the training data is: " + str(len(xs_training)))
 
         # Get the least squares, find the error bettwen teh training and test 
         for p in range(2, MAX_FEATURES+1):
@@ -188,10 +183,10 @@ def best_p (xs, ys):
             ys_hat = f(xs_testing, ls, p)
             # Find the square_error between test_ys and ys_hat
             err = square_error(ys_testing, ys_hat)
-            print("The error for p: " + str(p) + " is: " + str(err))
-            errors[p-2-1] += err
+            #print("The error for p: " + str(p) + " is: " + str(err))
+            errors[p-2] += err
         
-    print(errors)
+    # print(errors)
     # Return the value of the best p
     print("Best p is " + str (errors.index(min(errors)) + 2))
     return errors.index(min(errors)) + 2
@@ -202,8 +197,8 @@ def split_regression(xs, ys):
     while i < len(xs):
         lxs = np.take(xs, list(range(i, i+20)))
         lys = np.take(ys, list(range(i, i+20)))
-        fig, ax = regression(lxs, lys, fig, ax)
         i += 20
+        fig, ax = regression(lxs, lys, fig, ax)
     plt.show()
 
 def regression(xs, ys, fig, ax):
@@ -214,6 +209,8 @@ def regression(xs, ys, fig, ax):
     Returns:
         None
     """
+    print("The data this regression has got is: ")
+    print(xs, ys)
     # Get the best fitting number of p values
     p = best_p(xs, ys)
     # Calcualte least squares for this value of p 
@@ -222,7 +219,7 @@ def regression(xs, ys, fig, ax):
     # Calculate the values to plot
     lx = np.linspace(xs.min(), xs.max(), len(xs))
     ly = f(lx, ls, p)
-    print(square_error(ys, ly))
+    # print(square_error(ys, ly))
     ax.plot(lx, ly, '.')
     return fig, ax
 
@@ -248,6 +245,6 @@ def square_error(y, y_est):
 
 def are_lists_identical(cs, bs):
     if functools.reduce(lambda i, j : i and j, map(lambda m, k: m == k, cs, bs), True) :  
-        print ("The lists are identical") 
+        return True
     else : 
-        print ("The lists are not identical") 
+        return False
