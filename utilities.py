@@ -193,7 +193,17 @@ def best_p (xs, ys):
     print("Best p is " + str (errors.index(min(errors)) + 2))
     return errors.index(min(errors)) + 2
 
-def regression(xs, ys):
+def split_regression(xs, ys):
+    fig, ax = view_data_segments(xs, ys)  
+    i = 0
+    while i < len(xs):
+        lxs = np.take(xs, list(range(i, i+20)))
+        lys = np.take(ys, list(range(i, i+20)))
+        fig, ax = regression(lxs, lys, fig, ax)
+        i += 20
+    plt.show()
+
+def regression(xs, ys, fig, ax):
     """ Given xs and ys, plot linear regression with best_p features
     Args: 
         xs : List/array-like of x co-ordinates.
@@ -201,16 +211,17 @@ def regression(xs, ys):
     Returns:
         None
     """
-    fig, ax = view_data_segments(xs, ys)  
+    # Get the best fitting number of p values
     p = best_p(xs, ys)
+    # Calcualte least squares for this value of p 
     ls = gls(xs, ys, p)
-    print(ls)
+    
+    # Calculate the values to plot
     lx = np.linspace(xs.min(), xs.max(), len(xs))
-
     ly = f(lx, ls, p)
     print(square_error(ys, ly))
     ax.plot(lx, ly, '.')
-    plt.show()
+    return fig, ax
 
 # HANDY DANDY FUNCTIONS 
 
