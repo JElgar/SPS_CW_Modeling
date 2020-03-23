@@ -141,9 +141,6 @@ def reg(xs, ys, p):
 
     plt.show()
 
-def square_error(y, y_est):
-    return np.sum((y - y_est) ** 2)
-
 def best_p (xs, ys):
     """
     Get error values for all poly regressions and return the model with the smallest error
@@ -152,7 +149,7 @@ def best_p (xs, ys):
         ys : List/array-like of x co-ordinates, size <= 20
     """
     MAX_FEATURES = 8
-    NUM_REPEATS = 50
+    NUM_REPEATS = 1
 
     if (len(xs) != 20):
         print("xs lenght was not equal 20 so stuffs gonna break")
@@ -163,14 +160,16 @@ def best_p (xs, ys):
     Find the error in each of the models, shuffle the data and repeat, adding the errors each time
     At the end select the model with the lowest error and jobs a gooden
     """
+    xs_shuffle = xs.copy()
+    ys_shuffle = ys.copy()
     errors = [0] * (MAX_FEATURES - 2)
     for i in range(0, NUM_REPEATS):
-        xs_training, xs_testing = xs[6:], xs[:6]
-        ys_training, ys_testing = ys[6:], xs[:6]
+        xs_training, xs_testing = xs_shuffle[6:], xs_shuffle[:6]
+        ys_training, ys_testing = ys_shuffle[6:], ys_shuffle[:6]
         print("The lenght of the training data is: " + str(len(xs_training)))
 
         # Get the least squares, find the error bettwen teh training and test 
-        for p in range(2, MAX_FEATURES):
+        for p in range(2, MAX_FEATURES+1):
             # Get the least squares for the training set
             ls = gls(xs_training, ys_training, p)
             # Using the least squares calculate the predicted ys for the test xs
@@ -178,16 +177,53 @@ def best_p (xs, ys):
             # Find the square_error between test_ys and ys_hat
             err = square_error(ys_testing, ys_hat)
             print("The error for p: " + str(p) + " is: " + str(err))
-            errors[p-2] += err
-        np.random.shuffle(xs)
+            errors[p-2-1] += err
+        np.random.shuffle(xs_shuffle)
+        rng_state = np.random.get_state()
+        np.random.set_state(rng_state)
+        np.random.shuffle(ys_shuffle)
+        
     print(errors)
     # Return the value of the best p
+    print("Best p is " + str (errors.index(min(errors)) + 2))
     return errors.index(min(errors)) + 2
 
+def regression(xs, ys):
+    """ Given xs and ys, plot linear regression with best_p features
+    Args: 
+        xs : List/array-like of x co-ordinates.
+        ys : List/array-like of y co-ordinates.
+    Returns:
+        None
+    """
+    fig, ax = view_data_segments(xs, ys)  
+    p = best_p(xs, ys)
+    ls = gls(xs, ys, p)
+    print(ls)
+    lx = np.linspace(xs.min(), xs.max(), len(xs))
+
+    ly = f(lx, ls, p)
+    print(square_error(ys, ly))
+    ax.plot(lx, ly, '.')
+    plt.show()
+
+# HANDY DANDY FUNCTIONS 
+
+def setup (fileName):
+    xs, ys = load_points_from_file(fileName)
+    fig, ax = view_data_segments(xs, ys)
+    regression(xs, ys, fig, ax)
+    show(fig, ax)
+ 
+def show(fig, ax):
+    plt.show()
 
 def f(x, ls, p):
     y = 0
     for i in range(0, p):
        y += ls[i] * x ** i
     return y
+
+def square_error(y, y_est):
+    return np.sum((y - y_est) ** 2)
 
