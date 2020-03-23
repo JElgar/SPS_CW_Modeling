@@ -2,6 +2,8 @@ import os
 import sys
 import pandas as pd
 import numpy as np
+import copy as c 
+import functools
 from matplotlib import pyplot as plt
 
 def load_points_from_file(filename):
@@ -149,7 +151,7 @@ def best_p (xs, ys):
         ys : List/array-like of x co-ordinates, size <= 20
     """
     MAX_FEATURES = 8
-    NUM_REPEATS = 1
+    NUM_REPEATS = 50
 
     if (len(xs) != 20):
         print("xs lenght was not equal 20 so stuffs gonna break")
@@ -160,10 +162,17 @@ def best_p (xs, ys):
     Find the error in each of the models, shuffle the data and repeat, adding the errors each time
     At the end select the model with the lowest error and jobs a gooden
     """
-    xs_shuffle = xs.copy()
-    ys_shuffle = ys.copy()
+    xs_shuffle = c.deepcopy(xs)
+    ys_shuffle = c.deepcopy(ys)
     errors = [0] * (MAX_FEATURES - 2)
     for i in range(0, NUM_REPEATS):
+        rng_state = np.random.get_state()
+        np.random.set_state(rng_state)
+        np.random.shuffle(xs_shuffle)
+        np.random.set_state(rng_state)
+        np.random.shuffle(ys_shuffle)
+        assert not are_lists_identical(xs, xs_shuffle)
+        assert not are_lists_identical(ys, ys_shuffle)
         xs_training, xs_testing = xs_shuffle[6:], xs_shuffle[:6]
         ys_training, ys_testing = ys_shuffle[6:], ys_shuffle[:6]
         print("The lenght of the training data is: " + str(len(xs_training)))
@@ -178,10 +187,6 @@ def best_p (xs, ys):
             err = square_error(ys_testing, ys_hat)
             print("The error for p: " + str(p) + " is: " + str(err))
             errors[p-2-1] += err
-        np.random.shuffle(xs_shuffle)
-        rng_state = np.random.get_state()
-        np.random.set_state(rng_state)
-        np.random.shuffle(ys_shuffle)
         
     print(errors)
     # Return the value of the best p
@@ -227,3 +232,8 @@ def f(x, ls, p):
 def square_error(y, y_est):
     return np.sum((y - y_est) ** 2)
 
+def are_lists_identical(cs, bs):
+    if functools.reduce(lambda i, j : i and j, map(lambda m, k: m == k, cs, bs), True) :  
+        print ("The lists are identical") 
+    else : 
+        print ("The lists are not identical") 
