@@ -153,7 +153,7 @@ def best_p (xs, ys):
         xs : List/array-like of x co-ordinates, size <= 20
         ys : List/array-like of x co-ordinates, size <= 20
     """
-    MAX_FEATURES = 8
+    MAX_FEATURES = 5
     NUM_REPEATS = 50
 
     if (len(xs) != 20):
