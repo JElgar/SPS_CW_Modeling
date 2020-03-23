@@ -84,9 +84,6 @@ def linear_reg(xs, ys, fig, ax):
     return fig, ax
 
 
-def f(x, a, b, c):
-    return a*x**2 + b*x + c
-
 def gls(xs, ys, p):
     """ Calculate least squares of data with order p
     Args:
@@ -103,7 +100,6 @@ def gls(xs, ys, p):
     v = np.linalg.inv(x_o.T.dot(x_o)).dot(x_o.T).dot(ys)
     return v
 
-    
 def treg(xs, ys, fig, ax):
     i = 0
     while i < len(xs):
@@ -120,7 +116,6 @@ TODO:
     - Implement trig a + bsin(cx + d)
 """
 
-
 def reg(xs, ys, p):
     """ Given xs and ys, plot linear regression with features p
     Args: 
@@ -130,6 +125,7 @@ def reg(xs, ys, p):
         None
     """
     fig, ax = view_data_segments(xs, ys)  
+    # This is temporary and eventually will call on only 20 points
     if p == 2:
         fig, ax = treg(xs, ys, fig, ax)
     else: 
@@ -148,4 +144,50 @@ def reg(xs, ys, p):
 def square_error(y, y_est):
     return np.sum((y - y_est) ** 2)
 
+def best_p (xs, ys):
+    """
+    Get error values for all poly regressions and return the model with the smallest error
+    Args:
+        xs : List/array-like of x co-ordinates, size <= 20
+        ys : List/array-like of x co-ordinates, size <= 20
+    """
+    MAX_FEATURES = 8
+    NUM_REPEATS = 50
+
+    if (len(xs) != 20):
+        print("xs lenght was not equal 20 so stuffs gonna break")
+        print("actually not yet")
+
+    
+    """
+    Find the error in each of the models, shuffle the data and repeat, adding the errors each time
+    At the end select the model with the lowest error and jobs a gooden
+    """
+    errors = [0] * (MAX_FEATURES - 2)
+    for i in range(0, NUM_REPEATS):
+        xs_training, xs_testing = xs[6:], xs[:6]
+        ys_training, ys_testing = ys[6:], xs[:6]
+        print("The lenght of the training data is: " + str(len(xs_training)))
+
+        # Get the least squares, find the error bettwen teh training and test 
+        for p in range(2, MAX_FEATURES):
+            # Get the least squares for the training set
+            ls = gls(xs_training, ys_training, p)
+            # Using the least squares calculate the predicted ys for the test xs
+            ys_hat = f(xs_testing, ls, p)
+            # Find the square_error between test_ys and ys_hat
+            err = square_error(ys_testing, ys_hat)
+            print("The error for p: " + str(p) + " is: " + str(err))
+            errors[p-2] += err
+        np.random.shuffle(xs)
+    print(errors)
+    # Return the value of the best p
+    return errors.index(min(errors)) + 2
+
+
+def f(x, ls, p):
+    y = 0
+    for i in range(0, p):
+       y += ls[i] * x ** i
+    return y
 
