@@ -100,10 +100,19 @@ def gls(xs, ys, p):
         x_o = np.column_stack((x_o, r))
 
     # TODO This is thrwoing single matrix error (does not have inverse)
-    v1 = np.linalg.inv(x_o.T.dot(x_o))
-    v2 = v1.dot(x_o.T)
-    v = v2.dot(ys)
+    v = np.linalg.inv(x_o.T.dot(x_o)).dot(x_o.T).dot(ys)
     return v
+
+def exp_ls(xs, ys):
+    x = np.column_stack((np.ones(xs.shape), np.exp(xs))
+    v = np.linalg.inv(x.T.dot(x)).dot(x.T).dot(ys)
+    return v
+
+def sin_ls(xs, ys):
+    x = np.column_stack((np.ones(xs.shape)), np.sin(xs))
+    v = np.linalg.inv(x.T.dot(x)).dot(x.T).dot(ys)
+    return v
+
 
 def treg(xs, ys, fig, ax):
     i = 0
@@ -190,6 +199,9 @@ def best_p (xs, ys):
     # Return the value of the best p
     print("Best p is " + str (errors.index(min(errors)) + 2))
     return errors.index(min(errors)) + 2
+
+def best_model (xs, ys):
+
 
 def split_regression(xs, ys):
     fig, ax = view_data_segments(xs, ys)  
