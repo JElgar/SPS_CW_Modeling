@@ -162,7 +162,7 @@ def best_p (xs, ys):
     """
     xs_shuffle = c.deepcopy(xs)
     ys_shuffle = c.deepcopy(ys)
-    errors = [0] * (MAX_FEATURES - 1)
+    errors = [0] * (MAX_FEATURES - 2 + 1) # When multiplying you dont index at zero (that makes sense in my head sorry)
     for i in range(0, NUM_REPEATS):
         rng_state = np.random.get_state()
         np.random.set_state(rng_state)
@@ -183,7 +183,7 @@ def best_p (xs, ys):
             ys_hat = f(xs_testing, ls, p)
             # Find the square_error between test_ys and ys_hat
             err = square_error(ys_testing, ys_hat)
-            #print("The error for p: " + str(p) + " is: " + str(err))
+            print("The error for p: " + str(p) + " is: " + str(err))
             errors[p-2] += err
         
     # print(errors)
