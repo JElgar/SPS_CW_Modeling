@@ -6,6 +6,8 @@ import copy as c
 import functools
 from matplotlib import pyplot as plt
 
+NUM_REPEATS = 50
+
 def load_points_from_file(filename):
     """Loads 2d points from a csv called filename
     Args:
@@ -151,7 +153,7 @@ def reg(xs, ys, p):
         for i in range(0, p):
            ly += ls[i] * lx ** i
         print(square_error(ys, ly))
-        ax.plot(lx, ly, '.')
+        ax.plot(lx, ly)
 
     plt.show()
 
@@ -163,7 +165,6 @@ def best_p (xs, ys):
         ys : List/array-like of x co-ordinates, size <= 20
     """
     MAX_FEATURES = 5
-    NUM_REPEATS = 50
 
     """
     Find the error in each of the models, shuffle the data and repeat, adding the errors each time
@@ -187,7 +188,7 @@ def best_p (xs, ys):
         # Get the least squares, find the error bettwen teh training and test 
         for p in range(2, MAX_FEATURES+1):
             # Get the least squares for the training set
-            ls = gls(xs_training, ys_training, p)
+            ls = ep(xs_training, ys_training, p)
             # Using the least squares calculate the predicted ys for the test xs
             ys_hat = f(xs_testing, ls, p)
             # Find the square_error between test_ys and ys_hat
@@ -198,10 +199,40 @@ def best_p (xs, ys):
     # print(errors)
     # Return the value of the best p
     print("Best p is " + str (errors.index(min(errors)) + 2))
-    return errors.index(min(errors)) + 2
+    m = min(errors)
+    return errors.index(m) + 2, m
 
 def best_model (xs, ys):
-    print("This needs implementing")
+    # Get the best fitting poly
+    bestp, poly_err = best_p(xs, ys)
+    poly_err = 0
+    exp_err = 0
+    for i in range(0, NUM_REPEATS):
+        rng_state = np.random.get_state()
+        np.random.set_state(rng_state)
+        np.random.shuffle(xs_shuffle)
+        np.random.set_state(rng_state)
+        np.random.shuffle(ys_shuffle)
+        assert not are_lists_identical(xs, xs_shuffle)
+        assert not are_lists_identical(ys, ys_shuffle)
+
+        xs_training, xs_testing = xs_shuffle[6:], xs_shuffle[:6]
+        ys_training, ys_testing = ys_shuffle[6:], ys_shuffle[:6]
+       
+        # EXP
+        # Get the least squares for the training set
+        ls = exp_ls(xs_training, ys_training)
+        # Using the least squares calculate the predicted ys for the test xs
+        ys_hat = f_exp(xs_testing, ls)
+        # Find the square_error between test_ys and ys_hat
+        err = square_error(ys_testing, ys_hat)
+        print("The error for p: " + str(p) + " is: " + str(err))
+        exp_err += err
+
+        # SIN
+
+
+
 
 def split_regression(xs, ys):
     fig, ax = view_data_segments(xs, ys)  
@@ -232,7 +263,7 @@ def regression(xs, ys, fig, ax):
     lx = np.linspace(xs.min(), xs.max(), len(xs))
     ly = f(lx, ls, p)
     # print(square_error(ys, ly))
-    ax.plot(lx, ly, '.')
+    ax.plot(lx, ly)
     return fig, ax
 
 # HANDY DANDY FUNCTIONS 
@@ -245,6 +276,10 @@ def setup (fileName):
  
 def show(fig, ax):
     plt.show()
+
+def f_exp(x, ls):
+    return ls[0] + ls[1] * np.exp(x)
+
 
 def f(x, ls, p):
     y = 0
