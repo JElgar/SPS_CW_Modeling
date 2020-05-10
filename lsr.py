@@ -144,7 +144,7 @@ def best_p (xs, ys):
             errors[p-2] += err
         
     # Return the value of the best p by finding p with lowest error
-    print("Best p is " + str (errors.index(min(errors)) + 2))
+    # print("Best p is " + str (errors.index(min(errors)) + 2))
     m = min(errors)
     return errors.index(m) + 2, m
 
@@ -201,18 +201,21 @@ def best_model (xs, ys):
         sin_err += err
        
 
-    print(exp_err, poly_err)
+    #print(exp_err, poly_err)
     # Return best type and if its polynomial the best number of features
     if (exp_err < poly_err and exp_err < sin_err):
+        #print("exponential")
         return "exp", -1
     
     if (poly_err < exp_err and poly_err < sin_err):
+        #print("polynomial with " + str(bestp) + " features")
         return "poly", bestp
 
     if (sin_err < exp_err and sin_err < poly_err):
+        #print("sin")
         return "sin", -1
 
-def split_regression(xs, ys):
+def split_regression(xs, ys, shouldPlot):
     """ Given xs and ys, plot linear regression for each 20 points with best_p features
     Args: 
         xs : List/array-like of x co-ordinates.
@@ -229,8 +232,10 @@ def split_regression(xs, ys):
         i += 20
         fig, ax, err = regression(lxs, lys, fig, ax)
         total_err += err
-    print("The total error of this regression is: " + str(total_err))
-    plt.show()
+    #print("The total error of this regression is: " + str(total_err))
+    print(str(total_err))
+    if shouldPlot: 
+        plt.show()
     return total_err
 
 def regression(xs, ys, fig, ax):
@@ -284,10 +289,10 @@ def regression(xs, ys, fig, ax):
 
 # Helper functions
 
-def setup (fileName):
+def setup (fileName, shouldPlot):
     xs, ys = load_points_from_file(fileName)
     if len(xs) > 0:
-        err = split_regression(xs, ys)
+        err = split_regression(xs, ys, shouldPlot)
  
 def show(fig, ax):
     plt.show()
@@ -307,9 +312,18 @@ def f(x, ls, p):
 def square_error(y, y_est):
     return np.sum((y - y_est) ** 2)
 
-if (len(sys.argv) != 2):
-    print("")
+if (len(sys.argv) == 2):
+    setup(sys.argv[1], False)
+elif (len(sys.argv) == 3):
+    if "--plot" in sys.argv:
+        if sys.argv.index("--plot") == 2:
+            filePath = sys.argv[1]
+        else:
+            filePath = sys.argv[2]
+        setup(filePath, True)
+    else:
+        print("Usage: python3 lsr.py path_to_file --plot")
 else: 
-    setup(sys.argv[1])
+    print("Usage: python3 lsr.py path_to_file --plot")
 
 
