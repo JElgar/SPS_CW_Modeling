@@ -15,8 +15,12 @@ def load_points_from_file(filename):
     Returns:
         (xs, ys) where xs and ys are a numpy array of the co-ordinates.
     """
-    points = pd.read_csv(filename, header=None)
-    return points[0].values, points[1].values
+    try:
+        points = pd.read_csv(filename, header=None)
+        return points[0].values, points[1].values
+    except FileNotFoundError as e:
+        print("That file was not found")
+        return [], []
 
 
 def view_data_segments(xs, ys):
@@ -290,7 +294,6 @@ def regression(xs, ys, fig, ax):
         ls = gls(xs, ys, p)
         # Calculate the values to plot
         ly = f(lx, ls, p)
-        # print(square_error(ys, ly))
         ax.plot(lx, ly)
        
         # Find ys values according to model
@@ -319,14 +322,13 @@ def regression(xs, ys, fig, ax):
 
     return fig, ax, err
 
+
 # Helper functions
 
 def setup (fileName):
     xs, ys = load_points_from_file(fileName)
-    #fig, ax = view_data_segments(xs, ys)
-    #regression(xs, ys, fig, ax)
-    split_regression(xs, ys)
-    #show(fig, ax)
+    if xs != []:
+        split_regression(xs, ys)
  
 def show(fig, ax):
     plt.show()
@@ -351,3 +353,11 @@ def are_lists_identical(cs, bs):
         return True
     else : 
         return False
+
+
+if (len(sys.argv) != 2):
+    print("")
+else: 
+    setup(sys.argv[1])
+
+
