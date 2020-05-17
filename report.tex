@@ -9,7 +9,7 @@
 \section{Introduction}
 
 \section{Regression}
-The role of regression is to generate a model, which represents the realtionship between the given data's independant variable and depent variable. 
+The role of regression is to generate a model, which represents the realtionship between the given data's independant variable and depent variable. Throughout the code we used matrix form to calculate the model. This works by find the solusion to the equation $A\overrightarrow{x} = \overrightarrow{b}$, where $A$ stores the given data, $\overrightarrow{a}$ gives the 3 unknowns (the axis) and $\overrightarrow{b}$ gives the least squares, which are the values which you mutliply the unknows by for a general model of the data. With perfect data we could simply find the inverse of $A$, which would give the pefect model for the given data. However in the event that the data is not perfect and therefore $A$ does not have an inverse, we cannot solve this equation and thus find a perfect model (one that gives the exact points of $A$). In this case we instead attempt to reduce the error of the inverse, represented by $\overrightarrow{b} - A\overrightarrow{x}$.
 
 In order to accurately predict the model the error (also known as residual) between the given data and the predicted data is minimised (The predicted data, is that given by the model). In this coursework the error is caulated using a square error, in order to prevent negative and positive errors from cancelling each other out. The formula for this is as follows: 
 
