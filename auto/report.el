@@ -6,7 +6,8 @@
     "article"
     "art10"
     "amsmath"
-    "graphicx")
+    "graphicx"
+    "multicol")
    (LaTeX-add-labels
     "fig:noise1"
     "fig:noise2"
